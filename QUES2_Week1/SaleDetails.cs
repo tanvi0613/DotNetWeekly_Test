@@ -1,5 +1,8 @@
 namespace WeeklyTest
 {
+    /// <summary>
+    /// This class will store the information of the sales
+    /// </summary>
     public class SaleDetails
     {
         public static SaleDetails? LastTransaction ;
@@ -14,16 +17,30 @@ namespace WeeklyTest
         public double ProfitOrLossAmount{get; set;}
         public double ProfitMarginPercent{get; set;}
 
-        public void SetSaleDetails(string invoiceNo, string customerName, string itemName, int quantity, double purchaseAmount, double sellingAmount)
+        /// <summary>
+        /// This will set the sales details after a few validations
+        /// </summary>
+        /// <param name="invoiceNo">Enter invoice no</param>
+        /// <param name="customerName">Enter customer name</param>
+        /// <param name="itemName">Enter item name</param>
+        /// <param name="quantity">Enter quanity</param>
+        /// <param name="purchaseAmount">Enter purchase amount</param>
+        /// <param name="sellingAmount">Enter selling amount</param>
+        public static void SetSaleDetails(string invoiceNo, string customerName, string itemName, int quantity, double purchaseAmount, double sellingAmount)
         {
             if (string.IsNullOrWhiteSpace(invoiceNo))
             {
                 Console.WriteLine("Bill Id cannot be empty.");
                 return;
             }
-            if(purchaseAmount > 0 || sellingAmount >= 0)
+            if(purchaseAmount <= 0 || sellingAmount < 0)
             {
                 Console.WriteLine("Invalid amount entered.");
+                return;
+            }
+            if (quantity <= 0)
+            {
+                Console.WriteLine("Quantity must be greater than zero.");
                 return;
             }
 
@@ -64,26 +81,39 @@ namespace WeeklyTest
             Console.WriteLine("Transaction saved successfully.");
         }
 
+        /// <summary>
+        /// This will re compute the profit/loss and display
+        /// </summary>
         public static void CalculateProfitOrLoss()
         {
-            SaleDetails saleDetails = new SaleDetails();
-            
-            double profitOrLossAmount = 0.0;
-            if(saleDetails.SellingAmount > saleDetails.PurchaseAmount)
+            if (!HasLastTransaction)
             {
-                profitOrLossAmount = saleDetails.SellingAmount - saleDetails.PurchaseAmount;
+                Console.WriteLine("No transaction available. Please create a new transaction first.");
+                return;
             }
-            else if(saleDetails.SellingAmount < saleDetails.PurchaseAmount)
+
+            double profitOrLossAmount = 0.0;
+
+            if (LastTransaction!.SellingAmount > LastTransaction.PurchaseAmount)
             {
-                profitOrLossAmount = saleDetails.PurchaseAmount - saleDetails.SellingAmount;
+                profitOrLossAmount = LastTransaction.SellingAmount - LastTransaction.PurchaseAmount;
+                Console.WriteLine("Profit: " + profitOrLossAmount);
+            }
+            else if (LastTransaction.SellingAmount < LastTransaction.PurchaseAmount)
+            {
+                profitOrLossAmount = LastTransaction.PurchaseAmount - LastTransaction.SellingAmount;
+                Console.WriteLine("Loss: " + profitOrLossAmount);
             }
             else
             {
-                profitOrLossAmount = 0;
+                Console.WriteLine("No Profit No Loss.");
             }
-            Console.WriteLine("Profit/ Loss:" + profitOrLossAmount);
         }
 
+
+        /// <summary>
+        /// This will display the last transaction
+        /// </summary>
         public static void ViewLastTransaction()
         {
             if (!HasLastTransaction)
@@ -105,5 +135,4 @@ namespace WeeklyTest
             Console.WriteLine("--------------------------------");
         }
     }
-
 }
